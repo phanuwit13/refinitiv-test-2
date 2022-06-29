@@ -1,24 +1,50 @@
-import logo from './logo.svg';
 import './App.css';
 
-function App() {
+import { useLayoutEffect, useState } from 'react'
+import axios from 'axios';
+
+function App () {
+
+  const [dataShow, setDataShow] = useState([])
+  const [rawData, setRawData] = useState([])
+
+  const onSearch = (str) => {
+    let newData = rawData.filter((item) => {
+      return item.toLowerCase().includes(str.toLowerCase())
+    })
+    setDataShow(newData)
+  };
+
+  const getData = async () => {
+    let response = await axios.get('https://api.publicapis.org/categories')
+    setDataShow(response.data.categories)
+    setRawData(response.data.categories)
+  }
+
+  useLayoutEffect(() => {
+    getData()
+  }, [])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <div>
+        <input type="text" onChange={(e) => { onSearch(e.target.value) }} />
+      </div>
+      <br />
+      <table>
+        <tbody>
+          {dataShow ? dataShow.map((item) => {
+            return (
+              <tr key={item}>
+                <td>
+                  {item}
+                </td>
+              </tr>
+            )
+          }) : null}
+        </tbody>
+      </table>
+    </>
   );
 }
 
